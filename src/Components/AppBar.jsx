@@ -11,7 +11,7 @@ export default function AppBar({firstName, lastName, headline, userId}) {
                     Hello, {`${firstName} ${lastName}`}
                 </div>
 
-                <div className="rounded-full cursor-pointer bg-gray-300 p-2 text-black text-sm font-medium flex items-center justify-center">
+                <div className="rounded-full cursor-pointer bg-gray-300 p-2 text-black text-sm font-medium flex items-center justify-center uppercase">
                     {`${firstName[0]}${lastName[0]}`}
                 </div>
             </div>

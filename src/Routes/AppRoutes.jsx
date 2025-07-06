@@ -5,6 +5,7 @@ import ProtectedPage from "../Pages/ProtectPage"
 import DashBoard from "../Pages/DashBoard"
 import SendMoney from "../Pages/SendMoney"
 import AuthWrapper from "../Components/AuthWrapper"
+import CardWrapper from "../Components/CardWrapper"
 
 export default function AppRoutes() {
 
@@ -17,7 +18,10 @@ export default function AppRoutes() {
 
             <Route element={<ProtectedPage/>}>
                 <Route path="" element={<DashBoard/>} />
-                <Route path="sendmoney" element={<SendMoney/>}/>
+                <Route element={<CardWrapper/>}>
+                    <Route path="sendmoney" element={<SendMoney/>}/>
+                </Route>
+
             </Route>
         </Routes>
     )

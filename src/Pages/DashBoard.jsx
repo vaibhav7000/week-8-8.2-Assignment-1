@@ -22,7 +22,8 @@ export default function DashBoard() {
     const searchAction = useCallback(async function() {
         clearTimeout(searchDebounce.current);
         searchDebounce.current = setTimeout(async function() {
-            const response = await fetch(`${backendBaseURL}/api/v1/user/bulk`, {
+            const search = searchInput.current.value;
+            const response = await fetch(`${backendBaseURL}/api/v1/user/bulk?filter=${search}`, {
                 method: "GET",
                 headers: {
                     "Authorization": userDetails.token,
@@ -52,7 +53,11 @@ export default function DashBoard() {
     }, []);
 
     const sendMoneyAction = useCallback(function(firstName, lastName, userId) {
-
+        navigate("sendmoney", {
+            state: {
+                firstName, lastName, userId
+            }
+        });
     })
 
     return (

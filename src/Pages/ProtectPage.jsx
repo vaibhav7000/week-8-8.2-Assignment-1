@@ -49,11 +49,11 @@ export default function ProtectedPage() {
     }
 
     return (
-        <>
+        <div className="h-[100vh] overflow-y-scroll w-[100vw] overflow-x-hidden">
             <AppBar firstName={userDetails.firstName} lastName={userDetails.lastName} headline={"Payment Application"}/>
             <Outlet/>
             <ToastContainer/>
-        </>
+        </div>
     )
 
 
