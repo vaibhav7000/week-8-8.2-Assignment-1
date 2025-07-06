@@ -14,12 +14,11 @@ export default function AppRoutes() {
                 <Route path="signin" element={<SignIn/>}/>
                 <Route path="signup" element={<SignUp/>}/>
             </Route>
-            <Route path="" element={<ProtectedPage>
-                <DashBoard/>
-            </ProtectedPage>}/>
-            <Route path="sendmoney" element={<ProtectedPage>
-                <SendMoney/>
-            </ProtectedPage>} />
+
+            <Route element={<ProtectedPage/>}>
+                <Route path="" element={<DashBoard/>} />
+                <Route path="sendmoney" element={<SendMoney/>}/>
+            </Route>
         </Routes>
     )
 }

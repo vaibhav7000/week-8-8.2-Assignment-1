@@ -2,7 +2,7 @@ import { useRef, useEffect } from "react";
 import { signUpValidator } from "../utils/validators";
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from "react-router";
-
+import { useAtom } from "jotai";
 
 import Heading from "../Components/Heading";
 import SubHeading from "../Components/SubHeading";
@@ -16,6 +16,7 @@ import { backendBaseURL } from "../utils/constants";
 
 export default function SignUp() {
     const navigate = useNavigate();
+
     const inputReference = [{
             label: "FirstName",
             placeHolder: "Vaibhav",
@@ -82,12 +83,14 @@ export default function SignUp() {
             }
 
             // token store and navigate to the dashbord
+            toast(output.msg); // signup successfull
             const token = output.token;
             localStorage.setItem("token", `Bearer ${token}`);
 
-            navigate("", {
+            navigate("/", {
                 replace: true
             })
+
         } catch (error) {
             toast("Something up with the backend server. Try again later");
         }

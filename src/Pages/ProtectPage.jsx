@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { Outlet, useNavigate } from "react-router";
 import {ClipLoader} from "react-spinners"
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 
 import { backendBaseURL } from "../utils/constants";
+import AppBar from "../Components/AppBar";
+import { userAtom } from "../store/userAtom";
+import { ToastContainer } from "react-toastify";
+
 
 const override = {
   display: "block",
@@ -11,10 +16,10 @@ const override = {
   borderColor: "red",
 };
 
-export default function ProtectedPage({children}) {
+export default function ProtectedPage() {
     // check token and verify from the backend -> if not present than divert the use to signin page
     const {isLoading, isValidToken} = useVerifyAuthToken();
-
+    const userDetails = useAtomValue(userAtom);
     const navigate = useNavigate();
 
     useEffect(function() {
@@ -45,7 +50,9 @@ export default function ProtectedPage({children}) {
 
     return (
         <>
-            {children}
+            <AppBar firstName={userDetails.firstName} lastName={userDetails.lastName} headline={"Payment Application"}/>
+            <Outlet/>
+            <ToastContainer/>
         </>
     )
 
@@ -69,6 +76,7 @@ function Loader({isLoading}) {
 function useVerifyAuthToken() {
     const [isLoading, setIsLoading] = useState(true);
     const [isValidToken, setIsValidToken] = useState(false);
+    const setUserAtom = useSetAtom(userAtom);
     useEffect(() => {
 
         async function verifyToken() {
@@ -79,7 +87,8 @@ function useVerifyAuthToken() {
                 return;
             }
 
-            const response = await fetch(`${backendBaseURL}/api/v1/user/authenticate`, {
+            // nodejs when sending the request to the backend server make lowercase to keys
+            const response = await fetch(`${backendBaseURL}/api/v1/user/userdetails`, {
                 method: "POST",
                 headers: {
                     "Authorization": token
@@ -93,6 +102,14 @@ function useVerifyAuthToken() {
                 setIsValidToken(false);
                 return
             }
+
+            setUserAtom({
+                userId: output.userId,
+                firstName: output.firstName,
+                lastName: output.lastName,
+                balance: output.balance,
+                token
+            })
 
             setIsLoading(false);
             setIsValidToken(true);
