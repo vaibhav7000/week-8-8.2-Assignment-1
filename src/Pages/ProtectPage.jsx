@@ -18,11 +18,15 @@ const override = {
 
 export default function ProtectedPage() {
     // check token and verify from the backend -> if not present than divert the use to signin page
-    const {isLoading, isValidToken} = useVerifyAuthToken();
+    const {isLoading, isValidToken, error} = useVerifyAuthToken();
     const userDetails = useAtomValue(userAtom);
     const navigate = useNavigate();
 
     useEffect(function() {
+        if(error) {
+            return
+        }
+
         if(!isValidToken && !isLoading) {
             navigate("signup", {
                 replace: true
@@ -30,10 +34,15 @@ export default function ProtectedPage() {
         }
     }, [isLoading]);
 
+    if(error) {
+        return (<div className="h-[100vh] w-[100vw] flex items-center justify-center">
+            <ErrorState/>
+        </div>)
+    }
 
     if(isLoading) {
         return (
-            <div className="h-[100vh] w-[100vw] items-center justify-center">
+            <div className="h-[100vh] w-[100vw] flex items-center justify-center">
                 <Loader isLoading={isLoading}/>
             </div>
         )
@@ -65,10 +74,19 @@ function Loader({isLoading}) {
             color={'#fb2c36'}
             loading={isLoading}
             cssOverride={override}
-            size={150}
+            size={50}
             aria-label="Loading Spinner"
             data-testid="loader"
         />
+    )
+}
+
+function ErrorState() {
+
+    return (
+        <div className="text-2xl text-black">
+            Servers are down! Try again after some time 😔
+        </div>
     )
 }
 
@@ -77,6 +95,7 @@ function useVerifyAuthToken() {
     const [isLoading, setIsLoading] = useState(true);
     const [isValidToken, setIsValidToken] = useState(false);
     const setUserAtom = useSetAtom(userAtom);
+    const [error, setErrorOccured] = useState(false);
     useEffect(() => {
 
         async function verifyToken() {
@@ -87,37 +106,43 @@ function useVerifyAuthToken() {
                 return;
             }
 
-            // nodejs when sending the request to the backend server make lowercase to keys
-            const response = await fetch(`${backendBaseURL}/api/v1/user/userdetails`, {
-                method: "POST",
-                headers: {
-                    "Authorization": token
+            try {
+                // nodejs when sending the request to the backend server make lowercase to keys
+                const response = await fetch(`${backendBaseURL}/api/v1/user/userdetails`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": token
+                    }
+                })
+
+                const output = await response.json();
+
+                if(response.status !== 200) {
+                    setIsLoading(false);
+                    setIsValidToken(false);
+                    return
                 }
-            })
 
-            const output = await response.json();
+                setUserAtom({
+                    userId: output.userId,
+                    firstName: output.firstName,
+                    lastName: output.lastName,
+                    balance: output.balance,
+                    token
+                })
 
-            if(response.status !== 200) {
                 setIsLoading(false);
-                setIsValidToken(false);
-                return
+                setIsValidToken(true);
+            } catch (error) {
+                console.log(error);
+                setIsLoading(false);
+                setErrorOccured(true);
             }
-
-            setUserAtom({
-                userId: output.userId,
-                firstName: output.firstName,
-                lastName: output.lastName,
-                balance: output.balance,
-                token
-            })
-
-            setIsLoading(false);
-            setIsValidToken(true);
         }
 
         verifyToken();
     }, []);
 
 
-    return {isLoading, isValidToken};
+    return {isLoading, isValidToken, error};
 }
