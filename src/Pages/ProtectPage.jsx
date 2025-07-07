@@ -21,6 +21,7 @@ export default function ProtectedPage() {
     const {isLoading, isValidToken, error} = useVerifyAuthToken();
     const userDetails = useAtomValue(userAtom);
     const navigate = useNavigate();
+    console.log("hello")
 
     useEffect(function() {
         if(error) {
